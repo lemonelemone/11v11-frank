@@ -1,0 +1,14 @@
+import assert from "node:assert/strict";
+import {spawn} from "node:child_process";
+import {setTimeout as wait} from "node:timers/promises";
+const cwd=new URL(".",import.meta.url).pathname.replace(/^\/(.:)/,"$1"),child=spawn(process.execPath,["server.mjs"],{cwd,env:{...process.env,NC11_HOST:"127.0.0.1",NC11_PORT:"18115",NC11_INACTIVITY_KICK_MS:"1000"},stdio:"pipe"});let log="";child.stdout.on("data",b=>log+=b);child.stderr.on("data",b=>log+=b);
+for(let i=0;i<80;i++){try{if((await fetch("http://127.0.0.1:18115/health",{signal:AbortSignal.timeout(100)})).ok)break;}catch{}if(i===79)throw Error(log);await wait(50);}
+function connect(id){return new Promise((resolve,reject)=>{const ws=new WebSocket(`ws://127.0.0.1:18115/?name=${id}&clientId=${id}`),messages=[];ws.onmessage=e=>{const m=JSON.parse(e.data);messages.push(m);if(m.t==="welcome")resolve({ws,messages,welcome:m});};ws.onerror=reject;});}
+async function message(c,type,predicate=()=>true,timeout=7000){const end=Date.now()+timeout;while(Date.now()<end){const found=c.messages.find(m=>m.t===type&&predicate(m));if(found)return found;await wait(20);}throw Error(`missing ${type}`);}
+try{
+ const admin=await connect("admin");assert.equal(admin.welcome.meowEnabled,true);assert.equal(admin.welcome.quickChatSet,"custom");assert.ok(await message(admin,"eventAssets",m=>m.imageData.length>100000&&m.audioData.length>1000));
+ admin.ws.send(JSON.stringify({t:"adminLogin",password:"Chicken999!"}));assert.equal((await message(admin,"adminLoginResult")).ok,true);const initialAdmin=await message(admin,"adminState");assert.equal(initialAdmin.rules.ballCount,1);assert.equal(initialAdmin.rules.boostDeceleration,1);assert.equal(initialAdmin.rules.matchSecondsNext,600);admin.ws.send(JSON.stringify({t:"adminSet",rules:{boostDeceleration:4,matchSecondsNext:1200}}));const changedAdmin=await message(admin,"adminState",m=>m.rules.boostDeceleration===4&&m.rules.matchSecondsNext===1200);assert.equal(changedAdmin.rules.boostDeceleration,4);assert.equal(changedAdmin.rules.matchSecondsNext,1200);
+ admin.ws.send(JSON.stringify({t:"setMeow",enabled:false}));assert.equal((await message(admin,"meowSetting")).enabled,false);admin.ws.send(JSON.stringify({t:"setQuickChat",set:"default"}));assert.equal((await message(admin,"quickChatSetting")).set,"default");admin.ws.send(JSON.stringify({t:"input",x:1,y:0,boost:false,brake:false}));
+ const idle=await connect("idle");const kicked=await message(idle,"returnHome",m=>m.code==="inactivity",7000);assert.equal(kicked.reason,"You have been kicked out for inactivity.");await wait(100);assert.equal((await fetch("http://127.0.0.1:18115/health").then(r=>r.json())).players,1,"idle player is removed for everyone, not left as reconnectable");
+admin.ws.close();idle.ws.close();console.log("PASS Frankfurt features: admin password/settings, event assets and movement-based inactivity removal");
+}finally{child.kill();}
