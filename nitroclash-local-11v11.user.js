@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         NitroClash — 11v11 Frankfurt
 // @namespace    nc-local-11v11-isolated
-// @version      0.1.43
+// @version      0.1.44
 // @description  NitroClash 11v11 Frankfurt client
 // @match        *://nitroclash.io/*
 // @match        *://www.nitroclash.io/*
@@ -12,7 +12,7 @@
 
 (() => {
   "use strict";
-  const DEFAULT_SERVER="wss://one1v11.onrender.com", SERVER_STORE="nc11-frankfurt-fixed", MODE="11v11", VERSION="0.1.43", PROTOCOL=38;
+  const DEFAULT_SERVER="wss://one1v11-frank.onrender.com", SERVER_STORE="nc11-frankfurt-fixed", MODE="11v11", VERSION="0.1.44", PROTOCOL=38;
   const MAX_INPUT_HZ=120, LOCAL_SMOOTHING_RATE=80, REMOTE_SMOOTHING_RATE=55, BALL_SMOOTHING_RATE=75;
   const CAMERA_MIN_ZOOM=.40, CAMERA_MAX_ZOOM=3.5, RENDER_DPR_CAP=1.5, RENDER_MAX_PIXELS=2560*1440, SNAPSHOT_TICK_MS=1000/60, INTERPOLATION_DELAY_MS=60, INTERPOLATION_MIN_MS=INTERPOLATION_DELAY_MS, INTERPOLATION_MAX_MS=INTERPOLATION_DELAY_MS;
   const STOCK_ASSETS=Object.freeze({PITCH:"/img/p/playfield-1.png",PLAYER_BLUE:"/img/player-B.png",ATLAS_IMAGE:"/img/spritesheet4.png",ATLAS_DATA:"/img/spritesheet4.json",BALL_FRAME:"ballWFG",BOOST_FRAME:"boost"});

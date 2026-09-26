@@ -17,7 +17,7 @@ try{
   const players=[];
   for(let i=0;i<22;i++){
     const c=await connect({name:`P${i}`,team:"0",clientId:`player-${i}`});
-    assert.equal(c.m.t,"welcome");assert.equal(c.m.protocol,38);assert.equal(c.m.mode.BUILD,"0.1.43");
+    assert.equal(c.m.t,"welcome");assert.equal(c.m.protocol,38);assert.equal(c.m.mode.BUILD,"0.1.44");
     players.push(c);
   }
   const mode=players[0].m.mode;
@@ -93,5 +93,5 @@ try{
   const zone=[];for(let i=0;i<11;i++)zone.push(await connect({party:"FIFTH31",clientId:`fifth-${i}`,name:`F${i}`}));await wait(3100);for(const c of zone)if(c.m.slot%2===0)c.ws.send(JSON.stringify({t:"input",x:-1,y:0,boost:true}));await wait(6500);const zoneState=zone[0].messages.filter(m=>m.t==="state").at(-1),blueInside=zoneState.p.filter(p=>p[7]&&p[0]%2===0&&p[1]<=mode.DEFENSIVE_FIFTH_DEPTH);assert.equal(blueInside.length,mode.DEFENSIVE_FIFTH_LIMIT,"a sixth teammate can never enter the defensive fifth");for(const c of zone)c.ws.close();
 
   for(const c of [...players,pace,penaltyBlue,penaltyRed,spectator,teamBlueA,teamRed,teamBlueB,host,guest])try{c.ws.close();}catch{}
-  console.log("PASS: v0.1.43 Frankfurt core rules, 8s corner timer, 10s throw-in timer, monotonic clock, spectator message, extended chat, braking and penalties");
+  console.log("PASS: v0.1.44 Frankfurt core rules, 8s corner timer, 10s throw-in timer, monotonic clock, spectator message, extended chat, braking and penalties");
 } finally {child.kill();}

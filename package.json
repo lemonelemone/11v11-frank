@@ -1,6 +1,6 @@
 {
   "name": "nitroclash-11v11-frankfurt",
-  "version": "0.1.43",
+  "version": "0.1.44",
   "private": true,
   "type": "module",
   "scripts": { "start": "node server.mjs", "test": "node test-local.mjs" },
